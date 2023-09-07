@@ -1,0 +1,15 @@
+.home {
+    width: 100%;
+  }
+  .homeContainer {
+    margin-top:2%;
+    display: flex;
+    justify-content: space-around;
+}
+  .leftPanel{
+    flex:1
+  }
+  .rightPanel{
+    flex:6 
+  }
+  

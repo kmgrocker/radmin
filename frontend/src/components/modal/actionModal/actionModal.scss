@@ -1,0 +1,36 @@
+form{
+    display: flex;
+    flex-direction: column;
+    padding: 4%;
+    color:black;
+    font-weight: 400;
+    &:hover{
+        color:black;
+        font-weight: 400;
+    }        
+}
+
+.contentWrapper{
+    padding: 4%;
+    width: 640px;
+}
+.formgroup{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2% 0;
+    font-size:1rem;
+    font-weight: 500;
+    input{
+        width: 100%;
+        flex:1;
+        justify-content: center;
+    }
+    .inputWrapper{
+        display:flex;
+        flex-direction:column;
+        flex:1;
+        margin-left:12%;
+    }
+}
+
