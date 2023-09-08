@@ -43,9 +43,10 @@ export const userColumns = [
       headerName: "Logo",
       width: 300,
       renderCell: (params) => {
+        const defualtLogoImage = "https://images.pexels.com/photos/1820770/pexels-photo-1820770.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
         return (
           <div className="cellWithImg">
-            <img className="cellImg" src={params.row.logo} alt="logo" />
+            <img className="cellImg" src={params.row.logo || defualtLogoImage} alt="logo" />
           </div>
         );
       },

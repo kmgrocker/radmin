@@ -1,5 +1,6 @@
 form{
     display: flex;
+    // width: 650px;
     flex-direction: column;
     padding: 4%;
     color:black;
@@ -24,4 +25,11 @@ form{
         flex:1;
         justify-content: center;
     }
+}
+
+.logoWrapper{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:1px solid transparent
 }

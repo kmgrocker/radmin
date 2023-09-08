@@ -23,6 +23,9 @@ export const OrgnaziationModal = ({ setOpen }) => {
   const [org, setOrg] = useState("");
   const [theme, setTheme] = useState("");
   const [error, setError] = useState(false);
+  const [logo, setLogo] = useState("");
+  const [logoPreview, setLogoPreview] = useState("");
+
   const [errorHelperText, setErrorHelperText] = useState("");
   const { actionType, fetchItemId, selected, setActionType } =
     useContext(ModalActionContext);
@@ -30,10 +33,16 @@ export const OrgnaziationModal = ({ setOpen }) => {
   const addOrg = async (actionType) => {
     let url = `${BASE_URL}/org`;
     let method = "post";
-    const actionPayload = {
-      name: org,
-      theme: theme,
-    };
+    // const actionPayload = {
+    //   name: org,
+    //   theme: theme,
+    // };
+    const actionPayload = new FormData();
+    actionPayload.append('name',org)
+    actionPayload.append('theme',theme)
+    actionPayload.append('logo',logo)
+
+    console.log(actionPayload);
     if (actionType === "edit") {
       url = `${BASE_URL}/org/${fetchItemId}`;
       method = "put";
@@ -43,7 +52,9 @@ export const OrgnaziationModal = ({ setOpen }) => {
         method: method,
         url: url,
         data: actionPayload,
-        headers: headerConfig,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
       });
       if (data) {
         setError(false);
@@ -66,11 +77,13 @@ export const OrgnaziationModal = ({ setOpen }) => {
         );
         setOrg(data?.data?.name);
         setTheme(data?.data?.theme);
+        setLogoPreview(data?.data?.logo)
       } catch (error) {
         setError(true);
         setErrorHelperText("something went wrong please try again");
         setOrg("");
         setTheme("");
+        setLogoPreview("")
       }
     };
     if (fetchItemId) {
@@ -78,7 +91,8 @@ export const OrgnaziationModal = ({ setOpen }) => {
     }
   }, [fetchItemId, selected, actionType]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault()
     if (!org || !theme) {
       setError(true);
       setErrorHelperText("action can not be empty");
@@ -87,10 +101,23 @@ export const OrgnaziationModal = ({ setOpen }) => {
       await addOrg(actionType);
     }
   };
+
+  const fileHanlder = (e)=>{
+   const reader = new FileReader();
+   reader.onload = () => {
+       if (reader.readyState === 2) {
+           setLogoPreview(reader.result)
+           setLogo(reader.result)
+       }
+   }
+   reader.readAsDataURL(e.target.files[0])
+  }
+
+
   return (
+    <form encType='multipart/form-data' onSubmit={handleSubmit}>
     <Box
       sx={{
-        minWidth: 600,
         height: "auto",
         color: "black",
         fontWeight: 500,
@@ -98,7 +125,6 @@ export const OrgnaziationModal = ({ setOpen }) => {
     >
       <DialogTitle>Organizations</DialogTitle>
       <DialogContent>
-        <form>
           <div className="formgroup">
             <label>organization name*</label>
             <OutlinedInput
@@ -128,9 +154,12 @@ export const OrgnaziationModal = ({ setOpen }) => {
           </div>
           <div className="formgroup">
             <label>organization logo</label>
-            <OutlinedInput type="file" id="orglogo" sx={{ width: "60%" }} />
+            <OutlinedInput type='file' id="logo" name='logo' accept="iamges/*"  onChange={fileHanlder} sx={{ width: "60%" }} />
           </div>
-        </form>
+          {(logoPreview || logo) && (<div className="logoWrapper">
+            <img width={80} height={80} className="logoWrapper" src={logoPreview}  />
+          </div>)}
+
       </DialogContent>
       <DialogActions sx={{ padding: "4%" }}>
         <Button variant="contained" onClick={handleSubmit}>
@@ -141,6 +170,7 @@ export const OrgnaziationModal = ({ setOpen }) => {
         </Button>
       </DialogActions>
     </Box>
+    </form>
   );
 };
 

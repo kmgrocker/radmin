@@ -1,14 +1,17 @@
 import asyncHandler from 'express-async-handler'
 import Org from '../models/orgModel.js'
+import fileUpload from 'express-fileupload'
 
 // create 
-export const createOrg= asyncHandler(async(req,res,next)=>{
-    try {
-    const organization = await Org.create(req.body);
-       res.status(201).json({success:true,organization})
-    } catch (error) {
-        res.status(500).json(error)
-    }
+export const createOrg= asyncHandler(async(req,res,next)=>{ 
+   // dealing with base 64 which is less efficent if this file upload task is more in that case we can use multer or some other cloud storage 
+   try {
+      const organization = Org.create({name:req.body.name,theme:req.body.theme,logo:req.body.logo});
+         res.status(201).json({success:true,organization})
+      } catch (error) {
+          res.status(500).json(error)
+      }
+   
  })
 
  // get by ID
