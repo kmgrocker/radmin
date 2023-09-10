@@ -8,6 +8,7 @@ import {
   Box,
   FormControl,
   MenuItem,
+  NativeSelect,
   OutlinedInput,
   Select,
   Tab,
@@ -26,8 +27,10 @@ import { BASE_URL } from "../../../utils/constant";
 import axios from "axios";
 
 export const RoleModal = ({ setOpen }) => {
-  const [org, setOrg] = useState("");
+  const [orgName, setOrgName] = useState("");
+  const [orgId, setOrgId] = useState("");
   const [role, setRole] = useState("");
+  const [orgs,setOrgs] = useState([])
   const [value, setValue] = useState(0);
   const [permissions, setPermissions] = useState([]);
   const [error, setError] = useState(false);
@@ -39,12 +42,16 @@ export const RoleModal = ({ setOpen }) => {
     setValue(newValue);
   };
 
+  const handleOrgChange = (e)=>{  
+    setOrgId(e.target.value)
+    setOrgName(e.target.value)
+  }
   const addRole = async (actionType) => {
     let url = `${BASE_URL}/role`;
     let method = "post";
     const actionPayload = {
       role: role,
-      organization: org,
+      organization: orgId,
       permissions: permissions,
     };
     if (actionType === "edit") {
@@ -77,24 +84,36 @@ export const RoleModal = ({ setOpen }) => {
         const { data } = await axios.get(
           resolveGetByIdURL(selected, fetchItemId)
         );
-        setOrg(data?.data?.organization);
+        
+        setOrgName(data?.data?.organization);
         setRole(data?.data?.role);
         setPermissions(data?.data?.permissions);
       } catch (error) {
         setError(true);
         setErrorHelperText("something went wrong please try again");
-        setOrg("");
+        setOrgName("");
         setRole("");
         setPermissions("");
       }
     };
+
+    const fetchOrg = async()=>{
+        const {data:{data:orgs}} = await axios.get(`${BASE_URL}/orgs`);
+        setOrgs(orgs)
+    }
+
+    fetchOrg();
+
     if (fetchItemId) {
       fetchItem();
     }
+
+   
+    
   }, [fetchItemId, selected, actionType]);
 
   const handleSubmit = async () => {
-    if (!org || !role || !permissions) {
+    if (!orgName || !role || !permissions) {
       setError(true);
       setErrorHelperText("action can not be empty");
       return;
@@ -140,13 +159,18 @@ export const RoleModal = ({ setOpen }) => {
                 <FormControl sx={{ width: "60%" }}>
                   <Select
                     id="org-select"
-                    value={org}
-                    onChange={(e) => setOrg(e.target.value)}
+                    value={orgName}
+                    onChange={handleOrgChange}
                     placeholder="select Organization"
+                   
+                    // defaultValue={orgName || ''}
                   >
-                    <MenuItem value="ADCB">ADCB</MenuItem>
-                    <MenuItem value="Nisaan">Nisaan</MenuItem>
-                    <MenuItem value="Honda">Honda</MenuItem>
+                    {orgs?.map(org=>{
+
+                      return (
+                        <MenuItem key={org._id} name={org._id}  data-id={org._id} selected={org.name === orgName} value={org._id}>{org.name}</MenuItem>
+                      )
+                    })}
                   </Select>
                 </FormControl>
               </div>

@@ -24,7 +24,9 @@ import axios from "axios";
 import { BASE_URL } from "../../../utils/constant";
 
 export const UserModal = ({ setOpen }) => {
-  const [org, setOrg] = useState("ADCB");
+  const [orgName, setOrgName] = useState("ADCB");
+  const [orgId, setOrgId] = useState("ADCB");
+  const [orgs,setOrgs] = useState([]);
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
   const [email, setEmail] = useState("");
@@ -47,6 +49,11 @@ export const UserModal = ({ setOpen }) => {
     return val === role;
   };
 
+  const handleOrgChange = (e)=>{  
+    setOrgId(e.target.value)
+    setOrgName(e.target.value)
+  }
+
   const addUser = async (actionType) => {
     let url = `${BASE_URL}/user`;
     let method = "post";
@@ -55,7 +62,7 @@ export const UserModal = ({ setOpen }) => {
       lastname: lname,
       email: email,
       roles: role,
-      organization: org,
+      organization: orgId,
     };
     if (actionType === "edit") {
       url = `${BASE_URL}/user/${fetchItemId}`;
@@ -82,8 +89,7 @@ export const UserModal = ({ setOpen }) => {
   };
 
   const handleSubmit = async() => {
-    console.log("org", org);
-    if (!lname || !fname || !email || !role || !org) {
+    if (!lname || !fname || !email || !role || !orgName) {
       setError(true);
       setErrorHelperText("action can not be empty");
       return;
@@ -100,7 +106,7 @@ export const UserModal = ({ setOpen }) => {
         const { data } = await axios.get(
           resolveGetByIdURL(selected, fetchItemId)
         );
-        setOrg(data?.data?.organization);
+        setOrgName(data?.data?.organization);
         setFname(data?.data?.firstname);
         setLname(data?.data?.lastname);
         setEmail(data?.data?.email);
@@ -108,13 +114,18 @@ export const UserModal = ({ setOpen }) => {
       } catch (error) {
         setError(true);
         setErrorHelperText("something went wrong please try again");
-        setOrg("");
+        setOrgName("");
         setFname("");
         setLname("");
         setEmail("");
         setRole("");
       }
     };
+    const fetchOrg = async()=>{
+      const {data:{data:orgs}} = await axios.get(`${BASE_URL}/orgs`);
+      setOrgs(orgs)
+  }
+  fetchOrg();
     if (fetchItemId) {
       fetchItem();
     }
@@ -136,8 +147,8 @@ export const UserModal = ({ setOpen }) => {
         <Box sx={{ width: "100%" }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs value={value} onChange={handleChange} aria-label="User Role">
-              <Tab label="Role" {...a11yProps(0)} />
-              <Tab label="Permissions" {...a11yProps(1)} />
+              <Tab label="User" {...a11yProps(0)} />
+              <Tab label="User Role" {...a11yProps(1)} />
             </Tabs>
           </Box>
           <TabPanel value={value} index={0}>
@@ -179,13 +190,16 @@ export const UserModal = ({ setOpen }) => {
                 <FormControl sx={{ width: "60%" }}>
                   <Select
                     id="org-select"
-                    value={org}
-                    onChange={(e) => setOrg(e.target.value)}
+                    value={orgName}
+                    onChange={handleOrgChange}
                     placeholder="select Organization"
                   >
-                    <MenuItem value="ADCB">ADCB</MenuItem>
-                    <MenuItem value="Nisaan">Nisaan</MenuItem>
-                    <MenuItem value="Honda">Honda</MenuItem>
+    
+                      {orgs?.map(org=>{
+                      return (
+                        <MenuItem key={org._id} name={org._id}   data-id={org._id} selected={org.name === orgName} value={org._id}>{org.name}</MenuItem>
+                      )
+                    })}
                   </Select>
                 </FormControl>
               </div>

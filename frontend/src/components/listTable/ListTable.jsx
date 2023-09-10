@@ -24,10 +24,18 @@ useEffect(()=>{
 
   const handleDelete = async(selected,id) => {
     try {
-      await axios.delete(resolveGetByIdURL(selected,id))
+      const {data} = await axios.delete(resolveGetByIdURL(selected,id))
+      console.log(data);
+      if(!data.success){
+        alert(data.message);
+        return;
+      }
       reFetch();
     } catch (error) {
-      console.log('error')
+      if(!error?.response?.data?.success){
+        alert(error?.response?.data?.message)
+      }
+      console.log('error',error)
     }
   };
 

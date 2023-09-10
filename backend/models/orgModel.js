@@ -7,7 +7,7 @@ const orgSchema = mongoose.Schema({
       },
     theme:{
         type:String,
-        required:true
+        required:false
       },
     logo:{
         type:String,

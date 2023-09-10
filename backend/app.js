@@ -4,7 +4,7 @@ import bodyparser from 'body-parser';
 import adminRoute from './routes/adminRoute.js'
 import fileUpload from 'express-fileupload';
 
-import { notFound } from './middleware/errorMiddleware.js';
+import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 import dotenv from 'dotenv'
 
@@ -24,7 +24,7 @@ app.use(cors())
 // user defined middleware
 app.use('/api/v1/',adminRoute);
 
-
+// app.use(errorHandler)
 app.use(notFound);
 
 export default app;

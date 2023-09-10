@@ -1,6 +1,9 @@
 import asyncHandler from 'express-async-handler'
 import Org from '../models/orgModel.js'
 import fileUpload from 'express-fileupload'
+import Role from '../models/roleModel.js';
+import { ErrorHandler } from '../middleware/errorMiddleware.js';
+import User from '../models/userModel.js';
 
 // create 
 export const createOrg= asyncHandler(async(req,res,next)=>{ 
@@ -38,7 +41,16 @@ export const createOrg= asyncHandler(async(req,res,next)=>{
  // delete by ID 
 
  export const deleteOrgById = asyncHandler(async(req,res,next)=>{
+
+   // before deleting check that is is used or not with other entity 
+   // have to experiment wity mongoose delete pre hook that may be use full in this case
     try {
+      const  findTheExistingOrgInRoles = await Role.find({'organization.orgId':req.params.id})
+   
+      const  findTheExistingOrgInUsers = await User.find({'organization.orgId':req.params.id})
+      if(findTheExistingOrgInRoles.length>0 ||  findTheExistingOrgInUsers.length>0){
+         return res.status(400).json({success:false,message:'organization can not be deleted since it is in used'})
+      }
      await Org.findByIdAndDelete(req.params.id);
        res.status(200).json({success:true,message:'organization has been deleted'})
     } catch (error) {
